@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model payment {
+  paymentId     String       @id
+  registerId    String       @unique(map: "Payment_registerId_key")
+  amount        Float
+  paymentDate   DateTime
+  paymentStatus String
+  registration  registration @relation(fields: [registerId], references: [registerId], map: "Payment_registerId_fkey")
+}
+
+model registration {
+  registerId   String   @id
+  studentId    String
+  subjectId    String
+  registerDate DateTime
+  status       String
+  academicYear String
+  payment      payment?
+  student      student  @relation(fields: [studentId], references: [studentId], map: "Registration_studentId_fkey")
+  subject      subject  @relation(fields: [subjectId], references: [subjectId], map: "Registration_subjectId_fkey")
+
+  @@index([studentId], map: "Registration_studentId_fkey")
+  @@index([subjectId], map: "Registration_subjectId_fkey")
+}
+
+model student {
+  address      String
+  dateOfBirth  DateTime
+  gender       String
+  phoneNumber  String
+  studentId    String         @id
+  studentName  String
+  registration registration[]
+}
+
+model subject {
+  subjectId    String         @id
+  subjectName  String
+  semester     String
+  credit       Int
+  instructor   String
+  registration registration[]
+}
+
+model users {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      String
+  createdAt DateTime
+
+  @@map("users")
+}
